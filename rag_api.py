@@ -18,7 +18,6 @@ class QuestionRequest(BaseModel):
 
 @app.get("/", response_class=HTMLResponse)
 async def homepage():
-    # Clean HTML with indentation and consistent styling
     return """
     <html>
         <head>

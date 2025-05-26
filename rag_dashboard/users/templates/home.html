@@ -1,26 +1,133 @@
-<!-- templates/home.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Welcome to the API Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8" />
+    <title>Welcome to Serenity API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link 
         rel="stylesheet" 
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-    >
+    />
+    <style>
+        .hero-section {
+            padding: 80px 0;
+            background: linear-gradient(to right, #e3f2fd, #fce4ec);
+            border-radius: 10px;
+            margin-top: 60px;
+        }
+        .nav-link {
+            color: #333;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+        .trial-box {
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 10px;
+        }
+        .footer {
+            margin-top: 60px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+    </style>
 </head>
 <body class="bg-light">
 
-    <div class="container mt-5 text-center">
-        <h1 class="display-4 mb-3">Welcome to the API Dashboard</h1>
-        <p class="lead">Access and manage your personal API key securely.</p>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-light bg-white shadow-sm fixed-top">
+        <div class="container d-flex justify-content-between">
+            <div>
+                <a href="{% url 'login' %}" class="btn btn-sm btn-outline-primary me-2">Login</a>
+                <a href="{% url 'register' %}" class="btn btn-sm btn-primary">Register</a>
+            </div>
+            <div>
+                <a href="#" class="nav-link d-inline me-3">About</a>
+                <a href="#" class="nav-link d-inline">Contact & Billing</a>
+            </div>
+        </div>
+    </nav>
 
-        <div class="mt-4">
-            <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-2">Login</a>
-            <a href="{% url 'register' %}" class="btn btn-outline-secondary btn-lg">Register</a>
+    <!-- Hero / Welcome Section -->
+    <div class="container hero-section text-center">
+        <h1 class="display-4 fw-bold text-primary">Welcome to Serenity API</h1>
+        <p class="lead">Your personalized mental health companion, powered by RAG (Retrieval-Augmented Generation).</p>
+    </div>
+
+    <!-- RAG Playground -->
+    <div class="container mt-5">
+        <div class="trial-box text-center">
+            <h3 class="mb-3">Try Our RAG Assistant Without Logging In</h3>
+            <p class="text-muted mb-4">Get instant, AI-powered support for mental wellness topics. Just type below:</p>
+
+            <form id="ragForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <textarea name="question" class="form-control" rows="3" placeholder="Type your question here..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Ask Serenity</button>
+            </form>
+
+            <div id="responseArea" class="alert alert-info mt-4" style="display:none;"></div>
         </div>
     </div>
+
+    <!-- Mission Section -->
+    <div class="container mt-5 text-center">
+        <h4 class="text-secondary mb-3">🌱 Supporting University Students</h4>
+        <p class="lead">
+            Serenity API is built to assist university students in managing stress, anxiety, and emotional challenges through confidential, AI-enhanced support.
+            Our mission is to create a safe digital space for self-care, therapy, and guidance—anytime, anywhere.
+        </p>
+    </div>
+
+    <!-- Footer -->
+    <div class="container text-center footer">
+        &copy; 2025 Serenity API — Empowering Mental Wellness Through AI
+    </div>
+
+    <!-- JavaScript to Submit Form as JSON -->
+    <script>
+        const form = document.getElementById('ragForm');
+        const responseArea = document.getElementById('responseArea');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const question = form.question.value;
+
+            try {
+                const response = await fetch("/rag_api/ask", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+
+                const data = await response.json();
+                responseArea.style.display = 'block';
+
+                if (data.error) {
+                    responseArea.classList.add('alert-danger');
+                    responseArea.classList.remove('alert-info');
+                    responseArea.textContent = "Error: " + data.error;
+                } else {
+                    responseArea.classList.add('alert-info');
+                    responseArea.classList.remove('alert-danger');
+                    responseArea.textContent = data.response || "No response from the assistant.";
+                }
+
+            } catch (err) {
+                responseArea.style.display = 'block';
+                responseArea.classList.add('alert-danger');
+                responseArea.textContent = "Request failed: " + err.message;
+            }
+        });
+    </script>
 
 </body>
 </html>
