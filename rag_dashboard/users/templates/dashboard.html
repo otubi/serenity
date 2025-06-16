@@ -1,116 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard - Serenity AI Studio</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex;
-            height: 100vh;
-            background-color: #f5f7fa;
-        }
-        .sidebar {
-            width: 220px;
-            background: #2a3f54;
-            color: white;
-            padding: 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .sidebar h2 {
-            margin-top: 0;
-            font-size: 20px;
-            margin-bottom: 25px;
-            border-bottom: 1px solid #3e5269;
-            padding-bottom: 10px;
-        }
-        .sidebar a {
-            color: #a9b7c6;
-            text-decoration: none;
-            padding: 8px 10px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
-        }
-        .sidebar a:hover {
-            background-color: #1a2738;
-            color: white;
-        }
-        .main-content {
-            flex-grow: 1;
-            padding: 40px 60px;
-            background: white;
-            box-sizing: border-box;
-            overflow-y: auto;
-        }
-        .main-content h1 {
-            margin-top: 0;
-            font-weight: 600;
-            font-size: 28px;
-            color: #2a3f54;
-        }
-        .info-text {
-            font-size: 16px;
-            line-height: 1.5;
-            color: #444;
-            margin-bottom: 30px;
-            max-width: 600px;
-        }
-        .api-key-section {
-            background: #eaf1f8;
-            border: 1px solid #b0c4de;
-            padding: 20px;
-            max-width: 600px;
-            border-radius: 8px;
-        }
-        .api-key-section button {
-            background-color: #2a3f54;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 15px;
-            transition: background-color 0.3s;
-        }
-        .api-key-section button:hover {
-            background-color: #1a2738;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Serenity AI Studio Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #e8f5e9; /* Light green background */
+      display: flex;
+      min-height: 100vh;
+      color: #2a3f54;
+    }
+    .sidebar {
+      width: 220px;
+      background-color: #2a3f54;
+      color: #fff;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+    .sidebar a:hover {
+      background-color: #1a2738;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 30px 40px;
+      display: flex;
+      flex-direction: row;
+      gap: 30px;
+    }
+    .center {
+      flex: 2;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .breadcrumb {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 20px;
+    }
+    .breadcrumb span {
+      margin: 0 5px;
+    }
+    .center h2 {
+      margin-bottom: 15px;
+    }
+    .center p {
+      font-size: 15px;
+      margin: 10px 0;
+      color: #333;
+    }
+    .code-block {
+      background: #eee;
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin: 10px 0;
+    }
+    .right-sidebar {
+      width: 200px;
+      background-color: #dcedc8; /* Pale green for right sidebar */
+      padding: 20px;
+      border-radius: 8px;
+      height: fit-content;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .right-sidebar h4 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+    .right-sidebar a {
+      display: block;
+      margin-top: 10px;
+      text-decoration: none;
+      color: #2a3f54;
+      font-weight: 600;
+    }
+    .right-sidebar a:hover {
+      color: #1a2738;
+    }
+  </style>
 </head>
 <body>
-    <div class="main-content">
-        <h1>Get a Serenity API key</h1>
-        <p class="info-text">
-            To use the Serenity API, you need an API key. You can create a key with a few clicks in Serenity AI Studio.
-        </p>
-        <p class="info-text">
-            Get a Gemini API key in Google AI Studio.
-        </p>
-        <div class="api-key-section">
-            <p>Your current API key:</p>
-            <pre><code>{{ api_key|default:"No API key generated yet." }}</code></pre>
-            <form method="POST" action="{% url 'generate_api_key' %}">
-                {% csrf_token %}
-                <button type="submit">Generate API Key</button>
-            </form>
-        </div>
+
+  <!-- Left Sidebar -->
+  <div class="sidebar">
+    <h3>Serenity AI</h3>
+    <a href="#">Overview</a>
+    <a href="#">Quick Start</a>
+    <a href="#">API Key</a>
+    <a href="#">Pricing</a>
+    <a href="#">Models</a>
+    <a href="#">Playground</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Center Content -->
+    <div class="center">
+      <div class="breadcrumb">
+        Home <span>&gt;</span> Serenity API <span>&gt;</span> Models
+      </div>
+      <h2>Was this helpful?</h2>
+      <p>Send feedback | <strong>Get a Serenity API key</strong></p>
+
+      <p>To use the Serenity API, you need an API key. You can create a key with a few clicks in Serenity AI Studio.</p>
+      <p><a href="#">Get a Serenity API Key in Serenity AI Studio</a></p>
+
+      <h3>Set up your API key</h3>
+      <p>For initial testing, you can hardcode an API key, but this should only be temporary since it is not secure. The rest of this section explains how to set your API key locally for different operating systems.</p>
+
+      <h4>Linux/macOS - Bash</h4>
+      <p>Bash is common for Linux and macOS terminals. To check for a configuration file, run:</p>
+      <div class="code-block">~/.bashrc</div>
+      <p>If it doesn't exist, create and open it:</p>
+      <div class="code-block">
+        touch ~/.bashrc<br/>
+        open ~/.bashrc
+      </div>
+      <p>Add your API key:</p>
+      <div class="code-block">export SERENITY_API_KEY=&lt;YOUR_API_KEY_HERE&gt;</div>
+      <p>Apply the changes:</p>
+      <div class="code-block">source ~/.bashrc</div>
+
+      <h4>Send your first Serenity API request using FastAPI</h4>
+      <p>You can use <strong>FastAPI</strong> to create a simple API client like this:</p>
+      <div class="code-block">
+from fastapi import FastAPI, Header, HTTPException<br/>
+import requests<br/><br/>
+
+app = FastAPI()<br/><br/>
+
+API_KEY = "YOUR_API_KEY_HERE"<br/><br/>
+
+@app.get("/get-models")<br/>
+def get_models(api_key: str = Header(...)):<br/>
+    if api_key != API_KEY:<br/>
+        raise HTTPException(status_code=403, detail="Invalid API Key")<br/><br/>
+    response = requests.get(<br/>
+        "https://api.serenityai.com/v1/models",<br/>
+        headers={"Authorization": f"Bearer {api_key}"}<br/>
+    )<br/>
+    return response.json()
+      </div>
+      <p>Run your FastAPI app using:</p>
+      <div class="code-block">uvicorn main:app --reload</div>
     </div>
 
-    <div class="sidebar">
-        <h2>Serenity AI Studio</h2>
-        <a href="#">Quick Review</a>
-        <a href="#">Billing</a>
-        <a href="{% url 'generate_api_key' %}">API Key</a>
-        <a href="#">Library</a>
-        <a href="#">Overview</a>
-        <a href="#">Models</a>
-        <a href="#">Rate Limits</a>
+    <!-- Right Sidebar -->
+    <div class="right-sidebar">
+      <h4>Resources</h4>
+      <a href="#">View API Docs</a>
+      <a href="#">Help Center</a>
+      <a href="#">Community Forum</a>
+      <a href="#">Contact Support</a>
     </div>
+  </div>
+
 </body>
 </html>

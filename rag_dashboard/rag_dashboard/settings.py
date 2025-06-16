@@ -99,13 +99,19 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Login & logout redirects
-LOGIN_URL = '/accounts/login/'
-#LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_URL = '/login/'                    # Correct path to your login view
+LOGIN_REDIRECT_URL = '/dashboard/'      # Redirect here after successful login
+LOGOUT_REDIRECT_URL = '/login/'         # Redirect here after logout
+
+# Email settings
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'amosoj10@gmail.com'
-EMAIL_HOST_PASSWORD = 'zamobrown@gmail' 
+
+# WARNING: Never hardcode your email password in settings.py
+# Use environment variables instead for security.
+# For example:
+import os
+EMAIL_HOST_PASSWORD = os.getenv('zamobrown')  # Set this in your OS or .env file

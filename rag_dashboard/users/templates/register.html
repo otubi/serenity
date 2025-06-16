@@ -25,7 +25,6 @@
             background: linear-gradient(45deg, #198754, #157347);
             border: none;
         }
-        /* Chatbox-style alert */
         #postRegisterMessage {
             display: none;
             max-width: 500px;
@@ -39,7 +38,6 @@
             font-size: 1rem;
             border: 2px solid #badbcc;
         }
-        /* Container styling */
         .form-container {
             max-width: 480px;
             background: white;
@@ -59,40 +57,43 @@
     <form id="registerForm" method="post" novalidate>
         {% csrf_token %}
 
+        <!-- Username Field -->
         <div class="mb-3">
             <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
-            {{ form.username|add_class:"form-control" }}
+            {% render_field form.username class="form-control" required="required" %}
             {% if form.username.errors %}
                 <div class="invalid-feedback d-block">
-                    {% for error in form.username.errors %}{{ error }}<br>{% endfor %}
+                    {% for error in form.username.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
                 </div>
             {% endif %}
         </div>
 
+        <!-- Email Field -->
         <div class="mb-3">
             <label for="{{ form.email.id_for_label }}" class="form-label">Email address</label>
-            {{ form.email|add_class:"form-control"
-                         |attr:"type=email"
-                         |attr:"required"
-                         |attr:'pattern=[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
-                         |attr:'aria-describedby=emailHelp'
-            }}
+            {% render_field form.email class="form-control" type="email" required="required" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" aria-describedby="emailHelp" %}
             {% if form.email.errors %}
                 <div class="invalid-feedback d-block" id="emailHelp">
-                    {% for error in form.email.errors %}{{ error }}<br>{% endfor %}
+                    {% for error in form.email.errors %}
+                        {{ error }}<br>
+                    {% endfor %}
                 </div>
             {% endif %}
         </div>
 
-        {# Render all other fields except username and email #}
+        <!-- Render all other fields except username and email -->
         {% for field in form %}
             {% if field.name != 'username' and field.name != 'email' %}
                 <div class="mb-3">
                     <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field|add_class:"form-control" }}
+                    {% render_field field class="form-control" required="required" %}
                     {% if field.errors %}
                         <div class="invalid-feedback d-block">
-                            {% for error in field.errors %}{{ error }}<br>{% endfor %}
+                            {% for error in field.errors %}
+                                {{ error }}<br>
+                            {% endfor %}
                         </div>
                     {% endif %}
                 </div>
@@ -114,7 +115,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.getElementById('registerForm').addEventListener('submit', function(event) {
-        // Use native HTML5 validation before submission
         if (!this.checkValidity()) {
             event.preventDefault();
             event.stopPropagation();
@@ -122,14 +122,8 @@
             return;
         }
 
-        // Show the verification message after submission
         document.getElementById('postRegisterMessage').style.display = 'block';
-
-        // Disable submit button to prevent repeated clicks
         this.querySelector('button[type="submit"]').disabled = true;
-
-        // Actually submit the form (remove comment if handling form via JS)
-        // this.submit();
     });
 </script>
 </body>

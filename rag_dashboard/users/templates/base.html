@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}RAG Dashboard{% endblock %}</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+
+    <style>
+      /* Sidebar inspired by Serenity AI Studio */
+      body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        display: flex;
+        overflow: hidden;
+      }
+
+      .sidebar {
+        width: 220px;
+        background-color: #2a3f54;
+        color: #a9b7c6;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .sidebar h2 {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 30px;
+        border-bottom: 1px solid #3e5269;
+        padding-bottom: 10px;
+        color: white;
+      }
+
+      .sidebar a {
+        color: #a9b7c6;
+        text-decoration: none;
+        padding: 10px 12px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+        font-weight: 500;
+      }
+      .sidebar a:hover, .sidebar a.active {
+        background-color: #1a2738;
+        color: white;
+      }
+
+      .main-content {
+        flex-grow: 1;
+        padding: 40px 50px;
+        background-color: white;
+        overflow-y: auto;
+        box-sizing: border-box;
+        height: 100vh;
+      }
+
+      /* Messages */
+      .alert {
+        max-width: 700px;
+        margin-bottom: 20px;
+      }
+
+      /* Responsive tweak */
+      @media (max-width: 768px) {
+        body {
+          flex-direction: column;
+        }
+        .sidebar {
+          width: 100%;
+          flex-direction: row;
+          overflow-x: auto;
+          padding: 10px;
+        }
+        .sidebar h2 {
+          display: none;
+        }
+        .sidebar a {
+          flex: 1 0 auto;
+          margin: 0 5px;
+          padding: 10px 5px;
+          text-align: center;
+        }
+        .main-content {
+          padding: 20px 15px;
+          height: auto;
+        }
+      }
+    </style>
+</head>
+<body>
+
+  <nav class="sidebar" aria-label="Primary">
+    <h2>RAG Dashboard</h2>
+    <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">Home</a>
+    <a href="{% url 'create_project' %}" class="{% if request.path == '/create-project/' %}active{% endif %}">Create Project</a>
+    <a href="{% url 'proxy_ask_api' %}" class="{% if request.path == '/chat/' %}active{% endif %}">Chat</a>
+    <!-- Add more links here -->
+  </nav>
+
+  <main class="main-content" role="main">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}
+    <!-- Page content will be inserted here -->
+    {% endblock %}
+  </main>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  {% block scripts %}
+  <!-- Optional page-specific scripts -->
+  {% endblock %}
+
+</body>
+</html>

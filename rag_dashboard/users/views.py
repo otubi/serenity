@@ -15,7 +15,49 @@ from django.utils.http import urlsafe_base64_decode
 from django.utils.encoding import force_str  # for Django 4.x+
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.models import User
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import APIKey, Project
+from .forms import ProjectForm
+from django.contrib.auth.views import LoginView
+from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404
+from .forms import CustomUserCreationForm
 
+
+@login_required
+def generate_api_key(request, project_id):
+    # Ensure the selected project belongs to the current user
+    selected_project = get_object_or_404(Project, project_id=project_id, user=request.user)
+
+    if request.method == "POST":
+        # Get or create the API key for this user and project
+        api_key_obj, created = APIKey.objects.get_or_create(
+            project=selected_project,
+            user=request.user,
+            defaults={'key': secrets.token_urlsafe(32)}
+        )
+        # Redirect to dashboard or a confirmation page to avoid duplicate POST
+        return redirect('dashboard')
+
+    # If GET request, just show the page with project info
+    return render(request, 'generate_api_key.html', {
+        'selected_project': selected_project,
+    })
+
+
+@login_required
+def create_project(request):
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.user = request.user
+            project.save()
+            return redirect('generate_api_key')  # Pass project ID if needed
+    else:
+        form = ProjectForm()
+    return render(request, 'create_project.html', {'form': form})
 
 
 def home(request):
@@ -24,12 +66,12 @@ def home(request):
     """
     return render(request, 'home.html')
 
-
+""""
 @login_required
 def dashboard(request):
-    """
-    Dashboard for authenticated users to view or generate their API key.
-    """
+    
+   Dashboard for authenticated users to view or generate their API key.
+    
     try:
         api_key = APIKey.objects.get(user=request.user)
     except ObjectDoesNotExist:
@@ -37,22 +79,56 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', {'api_key': api_key})
 
+ """
+
 
 @login_required
+def dashboard(request):
+    """
+    Dashboard for authenticated users to view or generate their API keys (multiple allowed per user).
+    """
+    # Fetch projects owned by the user
+    projects = Project.objects.filter(user=request.user).order_by('project_name')
+    
+    # Optionally, get selected project ID from GET or default to None
+    project_id = request.GET.get('project_id')
+    project = None
+    if project_id:
+        try:
+            project = projects.get(project_id=project_id)
+        except Project.DoesNotExist:
+            project = None
+
+    # Fetch API keys for the user, optionally filtered by selected project if any
+    if project:
+        api_keys = APIKey.objects.filter(user=request.user, project=project).order_by('-created_at')
+    else:
+        api_keys = APIKey.objects.filter(user=request.user).order_by('-created_at')
+
+    # Pass projects, selected project, and api keys to template
+    context = {
+        'projects': projects,
+        'project': project,  # Renamed for consistency
+        'api_keys': api_keys,
+    }
+    return render(request, 'dashboard.html', context)
+
+""""
+@login_required
 def generate_api_key(request):
-    """
-    Generate a new API key for the user if it doesn't exist,
-    or regenerate it if already created.
-    """
-    api_key, created = APIKey.objects.get_or_create(user=request.user)
+    
+    # Generate or regenerate a secure API key for the authenticated user.
+    
+    api_key_obj, created = APIKey.objects.get_or_create(user=request.user)
 
     # Always regenerate the key
-    api_key.key = secrets.token_urlsafe(32)
-    api_key.save()
+    new_key = secrets.token_urlsafe(32)
+    api_key_obj.key = new_key
+    api_key_obj.save()
 
     return redirect('dashboard')
 
-
+"""
 @login_required
 def user_login(request):
     if request.method == "POST":
@@ -68,13 +144,13 @@ def user_login(request):
 
 def register(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             messages.success(request, "Account created successfully! You can now log in.")
-            return redirect('login')  # redirect to your login page
+            return redirect('login')
     else:
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
 
 
@@ -137,3 +213,61 @@ def activate(request, uidb64, token):
         return redirect('login')
     else:
         return render(request, 'users/activation_invalid.html')
+    
+
+def generate_api_key_default(request):
+    if request.method == "POST":
+        project_id = request.POST.get("project_id")
+        if project_id:
+            project = Project.objects.get(project_id=project_id, user=request.user)
+            new_key = APIKey.objects.create(
+                user=request.user,
+                project=project,
+                apikey=str(uuid.uuid4())
+            )
+        return redirect('dashboard')
+
+
+@login_required
+def create_project(request):
+    if request.method == 'POST':
+        form = ProjectForm(request.POST)
+        if form.is_valid():
+            project = form.save(commit=False)
+            project.user = request.user
+            project.save()
+            return redirect('generate_api_key', project_id=project.project_id)
+    else:
+        form = ProjectForm()
+    return render(request, 'create_project.html', {'form': form})
+
+""""
+@login_required
+def generate_api_key(request, project_id):
+    project = get_object_or_404(Project, project_id=project_id, user=request.user)
+
+    # Create or update the API key
+    api_key, created = APIKey.objects.get_or_create(project=project, user=request.user)
+    api_key.key = secrets.token_urlsafe(32)
+    api_key.save()
+
+    return redirect('view_api_key', project_id=project.project_id)
+"""
+
+@login_required
+def view_api_key(request, project_id):
+    project = get_object_or_404(Project, project_id=project_id, user=request.user)
+    api_key = get_object_or_404(APIKey, project=project, user=request.user)
+    return render(request, 'view_api_key.html', {
+        'api_key': api_key,
+        'masked_key': api_key.masked_key(),
+        'project': project
+    })
+
+
+class CustomLoginView(LoginView):
+    template_name = 'login.html'
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return reverse_lazy('dashboard')  # Make sure this URL name exists

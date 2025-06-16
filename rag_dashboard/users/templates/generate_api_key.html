@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Generate API Key - Serenity AI Studio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #f5f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+      color: #2a3f54;
+    }
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 25px;
+      color: #444;
+    }
+    button {
+      background-color: #2a3f54;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      font-size: 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background-color: #1a2738;
+    }
+    .api-key-container {
+      margin-top: 25px;
+      background: #eaf1f8;
+      padding: 15px 20px;
+      border-radius: 6px;
+      border: 1px solid #b0c4de;
+      font-family: monospace;
+      word-break: break-all;
+      font-size: 16px;
+      color: #2a3f54;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      user-select: none;
+    }
+    .api-key-text {
+      user-select: text;
+      cursor: text;
+      flex-grow: 1;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+    button.icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 0;
+      color: #2a3f54;
+      transition: color 0.3s;
+      user-select: none;
+    }
+    button.icon-btn:hover {
+      color: #1a2738;
+    }
+    #message {
+      margin-top: 12px;
+      color: green;
+      font-weight: 600;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+    }
+    #message.show {
+      opacity: 1;
+    }
+    a.back-link {
+      display: inline-block;
+      margin-top: 30px;
+      text-decoration: none;
+      color: #2a3f54;
+      font-weight: 600;
+      border: 1px solid #2a3f54;
+      padding: 8px 15px;
+      border-radius: 6px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    a.back-link:hover {
+      background-color: #2a3f54;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Generate API Key</h1>
+    <p>Project: <strong>{{ project.project_name }}</strong></p>
+
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit">Generate API Key</button>
+    </form>
+
+    {% if api_key %}
+      <div class="api-key-container" aria-label="Your API Key">
+        <span class="api-key-text" id="api-key-mask">************</span>
+        <span class="api-key-text" id="api-key-full" style="display:none;">{{ api_key.key }}</span>
+        <button type="button" class="icon-btn" id="toggle-visibility" aria-label="Show API Key">👁️</button>
+        <button type="button" class="icon-btn" id="copy-key" aria-label="Copy API Key">📋</button>
+      </div>
+      <div id="message">Remember to keep your API key secret!</div>
+    {% endif %}
+
+    <a href="{% url 'dashboard' %}" class="back-link">← Back to Dashboard</a>
+  </div>
+
+  <noscript>
+    <p style="color: red; font-weight: bold; margin-top: 20px;">
+      JavaScript is required to view and copy your API key.
+    </p>
+  </noscript>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn = document.getElementById('toggle-visibility');
+      const copyBtn = document.getElementById('copy-key');
+      const keyMask = document.getElementById('api-key-mask');
+      const keyFull = document.getElementById('api-key-full');
+      const message = document.getElementById('message');
+
+      if (toggleBtn && copyBtn) {
+        toggleBtn.addEventListener('click', () => {
+          const isMasked = keyMask.style.display !== 'none';
+          keyMask.style.display = isMasked ? 'none' : 'inline';
+          keyFull.style.display = isMasked ? 'inline' : 'none';
+          toggleBtn.textContent = isMasked ? '🙈' : '👁️';
+          toggleBtn.setAttribute('aria-label', isMasked ? 'Hide API Key' : 'Show API Key');
+        });
+
+        copyBtn.addEventListener('click', () => {
+          navigator.clipboard.writeText(keyFull.textContent.trim()).then(() => {
+            message.style.color = 'green';
+            message.textContent = 'API key copied to clipboard! Remember to keep it secret.';
+            message.classList.add('show');
+            setTimeout(() => message.classList.remove('show'), 4000);
+          }).catch(() => {
+            message.style.color = 'red';
+            message.textContent = 'Failed to copy API key. Please try again.';
+            message.classList.add('show');
+            setTimeout(() => message.classList.remove('show'), 4000);
+          });
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

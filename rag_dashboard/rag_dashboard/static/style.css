@@ -1,0 +1,30 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0; /* reset default margin */
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+footer {
+    background-color: #343a40;
+    color: white;
+    padding: 1rem 0;
+    text-align: center;
+    /* If you want footer always at the bottom of viewport, uncomment below */
+    /* position: fixed;
+       bottom: 0;
+       left: 0;
+       width: 100%; */
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+
+.alert {
+    margin-top: 1rem;
+    margin-bottom: 1rem; /* optional */
+}
