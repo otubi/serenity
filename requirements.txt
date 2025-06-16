@@ -5,4 +5,6 @@ chromadb
 openai
 google-generativeai
 langchain-google-genai
+langchain-chroma
+
 
