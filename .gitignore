@@ -1,5 +1,13 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+# SQLite database files
 *.sqlite3
+
+# Virtual environment folder
+venv311/
+venv312/
+venv/
